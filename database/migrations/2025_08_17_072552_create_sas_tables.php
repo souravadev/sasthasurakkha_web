@@ -58,7 +58,7 @@ return new class extends Migration
         });
 
         Schema::create('otps', function(Blueprint $table) {
-            $table->id()->primary();
+            $table->bigInteger('id')->primary();
             $table->foreignId('user_id')->references('id')->on('eusers');
             $table->string('email')->nullable();
             $table->string('phone', 15)->nullable();
