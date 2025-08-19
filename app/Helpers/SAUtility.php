@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use InvalidArgumentException;
 
 class SAUtility {
@@ -55,5 +57,11 @@ class SAUtility {
 
     public static function generate_action_id() {
         return SAUtility::generate_random_number(10);
+    }
+
+    public static function set_user_session($user_id) {
+        //
+
+        return true;
     }
 }
