@@ -16,7 +16,7 @@ return new class extends Migration
 
         //purpose
         Schema::create('action_purposes', function(Blueprint $table) {
-            $table->id()->primary();
+            $table->bigIncrements('purpose_id')->primary();
             $table->string('name')->unique();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
@@ -24,11 +24,8 @@ return new class extends Migration
 
         //End users
         Schema::create('eusers', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
+            $table->bigInteger('user_id')->primary();
             $table->uuid('guid')->unique()->default(DB::raw('uuid_generate_v4()'));
-            $table->string('first_name');
-            $table->string('middle_name')->nullable();
-            $table->string('last_name')->nullable();
             $table->string('full_name');
             $table->string('email')->unique()->nullable();
             $table->string('phone', 15)->unique();
@@ -42,7 +39,7 @@ return new class extends Migration
         });
 
         Schema::create('eroles', function(Blueprint $table) {
-            $table->id()->primary();
+            $table->bigIncrements('role_id')->primary();
             $table->string('name')->unique();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
@@ -50,20 +47,20 @@ return new class extends Migration
 
         Schema::create('euser_roles', function(Blueprint $table) {
             $table->id()->primary();
-            $table->foreignId('user_id')->references('id')->on('eusers');
-            $table->foreignId('role_id')->references('id')->on('eroles');
+            $table->foreignId('user_id')->references('user_id')->on('eusers');
+            $table->foreignId('role_id')->references('role_id')->on('eroles');
             $table->boolean('is_active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
 
         Schema::create('otps', function(Blueprint $table) {
-            $table->bigInteger('id')->primary();
-            $table->foreignId('user_id')->references('id')->on('eusers');
+            $table->bigInteger('action_id')->primary();
+            $table->foreignId('user_id')->references('user_id')->on('eusers');
             $table->string('email')->nullable();
             $table->string('phone', 15)->nullable();
             $table->string('otp', 6);
-            $table->foreignId('purpose_id')->references('id')->on('action_purposes');
+            $table->foreignId('purpose_id')->references('purpose_id')->on('action_purposes');
             $table->boolean('is_verified')->default(false);
             $table->boolean('is_used')->default(false);
             $table->timestamp('expiry_at');

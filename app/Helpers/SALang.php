@@ -9,7 +9,7 @@ class SALang {
     static string $user_already_exists = "User already exists";
     static string $something_went_wrong = "Something went wrong";
     static string $unable_to_create_new_user = "Unable to create new user";
-    static string $please_enter_first_name = "Please enter first name";
+    static string $please_enter_name = "Please enter name";
     static string $please_enter_phone = "Please enter phone";
     static string $invalid_user_id = "Invalid user id";
     static string $invalid_user = "Invalid user";

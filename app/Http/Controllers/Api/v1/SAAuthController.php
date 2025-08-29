@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Data\SAEUserData;
 use App\Data\SAOTPData;
-use App\Helpers\SAUtility;
+use App\Helpers\SAAuthUtility;
+use App\Helpers\SAConst;
+use App\Helpers\SALang;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Exception;
@@ -23,29 +25,38 @@ class SAAuthController extends Controller
                 $euser_data = new SAEUserData(
                     null,
                     null,
-                    $request->first_name,
-                    $request->middle_name,
-                    $request->last_name,
-                    null,
+                    $request->full_name,
                     $request->email,
                     $request->phone
                 );
 
-                $new_user = $euser_data->insert();
+                $final_user_id = null;
 
-                //
-                SAUtility::set_user_session($new_user->id);
+                $old_user = $euser_data->fetch();
 
-                //Otp
+                if(empty($old_user)) {
+                    //User not exists. Create new user
+
+                    $new_user = $euser_data->insert();
+
+                    $final_user_id = $new_user->user_id;
+                } else {
+                    $final_user_id = $old_user->user_id;
+                }
+
                 $otp_data = new SAOTPData(
                     null,
-                    $new_user->id,
-                    '4' //user login
+                    $final_user_id,
+                    SAConst::$purpose_id_login
                 );
 
                 $otp_data->trigger();
 
-                $data = $new_user;
+                $otp_token = SAAuthUtility::generate_otp_token($final_user_id, $otp_data);
+
+                $data = [
+                    "token" => $otp_token
+                ];
 
                 $status = true;
             }
@@ -62,7 +73,6 @@ class SAAuthController extends Controller
 
     private function valid_resuest_body(Request $request) : array {
         $validated = $request->validate([
-            'first_name' => 'required',
             'phone' => 'required|digits:10'
         ]);
 
@@ -72,17 +82,31 @@ class SAAuthController extends Controller
 
     public function authenticate(Request $request) {
         try {
-            $ctrl = new SAOTPController();
-            $data = $ctrl->verify($request)->getData(true);
+            $token_data = SAAuthUtility::get_data_from_jwt_token();
 
-            if($data['status']) {
-                //login
-                
+            $otp_ctrl = new SAOTPData(
+                $token_data['action_id'],
+                $token_data['user_id'],
+                $token_data['purpose_id'],
+                $request->otp
+            );
+
+            $otp_data = $otp_ctrl->verify();
+
+            if(empty($otp_data)) {
+                throw new Exception(SALang::$invalid_otp);
             }
 
+            $user_data_obj = new SAEUserData($token_data['user_id']);
+            $user_data = $user_data_obj->fetch();
+
+            SAAuthUtility::invalidate_token();
+            
+            $auth_token = SAAuthUtility::generate_auth_token($user_data, true);
+
             return response()->json([
-                'status' => $data['status'],
-                'message' => $data['message'] ?? null
+                'status' => true,
+                'token' => $auth_token
             ]);
         } catch(Exception $e) {
             return response()->json([

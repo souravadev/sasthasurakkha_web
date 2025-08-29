@@ -56,12 +56,12 @@ class SAOTPData {
                 throw new Exception(SALang::$invalid_action_id);
             }
 
-            $this->action_id = $otp_pre_data->id;
+            $this->action_id = $otp_pre_data->action_id;
             $this->purpose_id = $otp_pre_data->purpose_id;
         }
 
         //generate OTP
-        $this->user_id = $user->id;
+        $this->user_id = $user->user_id;
         $this->phone = $user->phone;
         $this->email = $user->email;
         $this->action_id ??= SAUtility::generate_action_id();
@@ -81,7 +81,7 @@ class SAOTPData {
 
     public function insert() {
         DB::table('otps')->insert([
-            'id' => $this->action_id,
+            'action_id' => $this->action_id,
             'purpose_id' => $this->purpose_id,
             'user_id' => $this->user_id,
             'phone' => $this->phone,
@@ -93,9 +93,9 @@ class SAOTPData {
 
     public function update($is_verified = false, $is_used = false) {
         DB::table('otps')
-        ->where('id', $this->action_id)
+        ->where('action_id', $this->action_id)
         ->update([
-            'id' => $this->action_id,
+            'action_id' => $this->action_id,
             'purpose_id' => $this->purpose_id,
             'user_id' => $this->user_id,
             'phone' => $this->phone,
@@ -110,7 +110,7 @@ class SAOTPData {
     public function fetch_by_action_id() {
         $otp_fq = DB::table('otps')
             ->select()
-            ->where('id',$this->action_id)
+            ->where('action_id',$this->action_id)
             ->first();
 
         return $otp_fq;
@@ -135,7 +135,7 @@ class SAOTPData {
 
         $data = DB::table('otps')
             ->select()
-            ->where('id', $this->action_id)
+            ->where('action_id', $this->action_id)
             ->where('user_id', $this->user_id)
             ->where('otp', $this->otp)
             ->where('purpose_id', $this->purpose_id)
@@ -151,7 +151,7 @@ class SAOTPData {
         }
 
         DB::table('otps')
-        ->where('id', $data->id)
+        ->where('action_id', $data->action_id)
         ->update([
             'is_verified' => true,
             'is_used' => true

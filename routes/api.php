@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\v1\SAOTPController;
 
 Route::prefix('v1')->group(function() {
     Route::post('/auth/request', [SAAuthController::class, 'execute']);
-    Route::post('/auth/verify', [SAAuthController::class, 'authenticate']);
-    Route::post('/otp/resend', [SAOTPController::class, 'resend']);
+
+    Route::middleware('jwt.verify')->group(function() {
+        Route::post('/otp/resend', [SAOTPController::class, 'resend']);
+        Route::post('/auth/verify', [SAAuthController::class, 'authenticate']);
+    });
 });

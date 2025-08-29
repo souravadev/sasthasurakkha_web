@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\DB;
 class SAEUserData {
     public $user_id = null;
     public $guid = null;
-    public $first_name = null;
-    public $middle_name = null;
-    public $last_name = null;
     public $full_name = null;
     public $email = null;
     public $phone = null;
@@ -25,9 +22,6 @@ class SAEUserData {
     public function __construct(
         $user_id = null,
         $guid = null,
-        $first_name = null,
-        $middle_name = null,
-        $last_name = null,
         $full_name = null,
         $email = null,
         $phone = null,
@@ -39,9 +33,6 @@ class SAEUserData {
     ) {
         $this->user_id = $user_id;
         $this->guid = $guid;
-        $this->first_name = $first_name;
-        $this->middle_name = $middle_name;
-        $this->last_name = $last_name;
         $this->full_name = $full_name;
         $this->email = $email;
         $this->phone = $phone;
@@ -56,14 +47,9 @@ class SAEUserData {
         //create user id
         $this->user_id ??= SAUtility::generate_user_id();
         $this->remember_token ??= SAUtility::generate_remember_token($this->user_id);
-        $this->full_name ??= $full_name ?? SAUtility::generate_full_name(
-            $this->first_name,
-            $this->middle_name,
-            $this->last_name
-        );
 
-        if(empty($this->first_name)) {
-            throw new Exception(SALang::$please_enter_first_name);
+        if(empty($this->full_name)) {
+            throw new Exception(SALang::$please_enter_name);
         }
 
         if(empty($this->phone)) {
@@ -77,10 +63,7 @@ class SAEUserData {
         }
 
         $result = DB::table('eusers')->insert([
-            'id' => $this->user_id,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
+            'user_id' => $this->user_id,
             'full_name' => $this->full_name,
             'email' => $this->email,
             'phone' => $this->phone,
@@ -103,7 +86,7 @@ class SAEUserData {
 
     public function fetch() {
         $user_data = DB::table('eusers')->select()
-            ->where('id', $this->user_id)
+            ->where('user_id', $this->user_id)
             ->orWhere('guid', $this->guid)
             ->orWhere('phone', $this->phone)
             ->first();

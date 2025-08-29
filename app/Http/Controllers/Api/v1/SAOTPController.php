@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Data\SAOTPData;
+use App\Helpers\SAAuthUtility;
 use App\Helpers\SALang;
 use App\Http\Controllers\Controller;
 use Exception;
@@ -12,9 +13,11 @@ class SAOTPController extends Controller {
 
     public function resend(Request $request) {
         try {
+            $token_data = SAAuthUtility::get_data_from_jwt_token();
+
             $otp_data = new SAOTPData(
-                $request->action_id,
-                $request->user_id
+                $token_data['action_id'],
+                $token_data['user_id']
             );
 
             $otp_data->trigger(true);
@@ -34,10 +37,12 @@ class SAOTPController extends Controller {
 
     public function verify(Request $request) {
          try {
+            $token_data = SAAuthUtility::get_data_from_jwt_token();
+
             $otp_data = new SAOTPData(
-                $request->action_id,
-                $request->user_id,
-                $request->purpose_id,
+                $token_data['action_id'],
+                $token_data['user_id'],
+                $token_data['purpose_id'],
                 $request->otp
             );
 
