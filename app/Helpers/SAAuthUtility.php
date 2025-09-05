@@ -53,4 +53,10 @@ class SAAuthUtility {
 
         return ($token_data['is_logged_in'] ?? false) == true;
     }
+
+    public static function get_user_id() {
+        $token_data = SAAuthUtility::get_data_from_jwt_token();
+
+        return ($token_data['user_id']);
+    }
 }

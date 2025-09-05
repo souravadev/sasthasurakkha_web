@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Auth;
 
 use App\Data\SAOTPData;
 use App\Helpers\SAAuthUtility;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Auth;
 
 use App\Data\SAEUserData;
 use App\Data\SAOTPData;
@@ -47,7 +47,7 @@ class SAAuthController extends Controller
                 $otp_data = new SAOTPData(
                     null,
                     $final_user_id,
-                    SAConst::$purpose_id_login
+                    SAConst::$purpose_id_User_Login_OTP_Verification
                 );
 
                 $otp_data->trigger();

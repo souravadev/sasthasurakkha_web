@@ -5,6 +5,7 @@ namespace App\Data;
 use App\Helpers\SALang;
 use Exception;
 use App\Data\SAEUserData;
+use App\Helpers\SAConst;
 use App\Helpers\SAUtility;
 use Illuminate\Support\Facades\DB;
 
@@ -74,7 +75,7 @@ class SAOTPData {
             SAOTPData::insert();
         }
 
-        if($this->purpose_id == '4') {
+        if($this->purpose_id == SAConst::$purpose_id_User_Login_OTP_Verification) {
             SAOTPData::send_login_otp();
         }
     }
