@@ -12,13 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //purpose
-        Schema::create('action_purposes', function(Blueprint $table) {
-            $table->bigIncrements('purpose_id')->primary();
-            $table->text('description');
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-        });
 
         //End users
         Schema::create('eusers', function (Blueprint $table) {
@@ -90,11 +83,10 @@ return new class extends Migration
         ');
 
         $tables = [
-            'users', 
+            'eusers', 
             'eroles', 
             'otps', 
             'supereadmins',
-            'action_purposes', 
             'euser_roles',
          ];
 
@@ -114,7 +106,7 @@ return new class extends Migration
     public function down(): void
     {
         $tables = [
-            'users', 
+            'eusers', 
             'eroles',
             'otps',
             'supereadmins', 

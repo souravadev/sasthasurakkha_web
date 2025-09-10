@@ -13,8 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('doctors', function(Blueprint $table) {
-            $table->bigIncrements('doctor_id')->primary();
-            $table->foreignId('user_id')->references('user_id')->on('users');
+            $table->bigInteger('doctor_id')->primary();
+            $table->foreignId('user_id')->references('user_id')->on('eusers');
             $table->string('work_email')->unique()->nullable();
             $table->string('work_phone', 15)->unique();
             $table->string('designation');
@@ -49,10 +49,43 @@ return new class extends Migration
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
 
+        Schema::create('hospitals', function(Blueprint $table) {
+            $table->bigIncrements('hospital_id')->primary();
+            $table->foreignId('ward_id')->references('ward_id')->on('wards');
+            $table->string('name');
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 10, 8)->nullable();
+            $table->text('address');
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+        });
+
         Schema::create('doctor_clinics', function(Blueprint $table) {
             $table->bigIncrements('id')->primary();
             $table->foreignId('doctor_id')->references('doctor_id')->on('doctors');
             $table->foreignId('clinic_id')->references('clinic_id')->on('clinics');
+            $table->foreignId('hospital_id')->references('hospital_id')->on('hospitals');
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+        });
+
+        Schema::create('doctor_appointment_status', function(Blueprint $table) {
+            $table->bigIncrements('status_id')->primary();
+            $table->string('name');
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+        });
+
+        Schema::create('doctor_appointments', function(Blueprint $table) {
+            $table->bigInteger('appointment_id')->primary();
+            $table->foreignId('pkg_id')->references('pkg_id')->on('packages');
+            $table->foreignId('doctor_id')->references('doctor_id')->on('doctors');
+            $table->foreignId('clinic_id')->references('clinic_id')->on('clinics')->nullable();
+            $table->foreignId('hospital_id')->references('hospital_id')->on('hospitals')->nullable();
+            $table->foreignId('specialization_id')->references('specialization_id')->on('specializations');
+            $table->timestamp('appointment_at');
+            $table->text('message');
+            $table->foreignId('status_id')->references('status_id')->on('doctor_appointment_status');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
@@ -75,7 +108,10 @@ return new class extends Migration
             'specializations',
             'doctor_specializations',
             'clinics',
-            'doctor_clinics'
+            'hospitals',
+            'doctor_clinics',
+            'doctor_appointment_status',
+            'doctor_appointments'
          ];
 
         foreach ($tables as $table) {
@@ -98,7 +134,10 @@ return new class extends Migration
             'specializations',
             'doctor_specializations',
             'clinics',
-            'doctor_clinics'
+            'hospitals',
+            'doctor_clinics',
+            'doctor_appointment_status',
+            'doctor_appointments'
         ];
 
         foreach($tables as $table) {
